@@ -1,3 +1,4 @@
 FLASK_APP=src
 FLASK_ENV=development
 FLASK_DEBUG=TRUE
+SQLALCHEMY_DATABASE_URI=sqlite:///bookmarks.db
