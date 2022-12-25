@@ -14,8 +14,8 @@ class User(db.Model):
     updated_at = db.Column(db.DateTime, onupdate=datetime.now())
     bookmarks = db.relationship('Bookmark', backref='user')
 
-    def __repr__(self) -> str:
-        return 'User>>> {self.username}'
+    def __repr__(self):
+        return f"User('id:{self.id}','username:{self.username}')"
 
 class Bookmark(db.Model):
         id = db.Column(db.Integer, primary_key=True)
@@ -39,8 +39,8 @@ class Bookmark(db.Model):
 
         def __init__(self, **kwargs):
              super().__init__(**kwargs)
-             self.short_url=self.generate_short_link
+             self.short_url=self.generate_short_link()
 
 
-        def __repr__(self) -> str:
-            return 'Bookmark>>> {self.url}'
+        def __repr__(self):
+            return f"Bookmarks('id:{self.id}','body:{self.body}' , 'url:{self.url}' )"

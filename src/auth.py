@@ -3,7 +3,7 @@ from src.constants.http_status_codes import HTTP_200_OK, HTTP_201_CREATED, HTTP_
 from src.database import db, User
 from werkzeug.security import check_password_hash, generate_password_hash
 import validators
-from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_jwt_extended import jwt_required,get_jwt_identity, create_access_token, create_refresh_token
 
 auth = Blueprint("auth", __name__, url_prefix="/api/v1/auth")
 
@@ -94,5 +94,22 @@ def login():
     }), HTTP_401_UNAUTHORIZED
  
 @auth.get("/me")
+@jwt_required()
 def me():
-    return{"user":"me"}
+    user_id = get_jwt_identity()
+    user = User.query.filter_by(id=user_id).first()
+    
+    return jsonify({
+            'username': user.username,
+            'email': user.email
+   }), HTTP_200_OK
+
+@auth.get ('/token/refresh')
+@jwt_required(refresh=True)
+def refresh_users_token():
+    identity = get_jwt_identity()
+    access = create_access_token(identity=identity)
+
+    return jsonify({
+        'access':access
+    }), HTTP_200_OK
