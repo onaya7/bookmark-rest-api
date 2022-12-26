@@ -3,6 +3,7 @@ from src.constants.http_status_codes import *
 from src.database import Bookmark, db
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import validators
+from datetime import datetime
 
 bookmarks = Blueprint("bookmarks", __name__, url_prefix="/api/v1/bookmarks")
 
@@ -15,8 +16,7 @@ def add_bookmark():
         # assigning variables to store data from json
         body = request.get_json().get('body', '')
         url = request.get_json().get('url', '')
-        print(body)
-        print(url)
+        
 
         # To check if url is valid
         if not validators.url(url):
@@ -52,12 +52,19 @@ def get_bookmark():
     # get current user from jwt
     current_user = get_jwt_identity()
 
-    # filter db with the current user
-    bookmarks = Bookmark.query.filter_by(user_id= current_user)
+    #working with pagination 
+    #setting default page to 1 and asigning 5 pages per page
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 5, type=int)
 
+    # filter db with the current user and adding pagination to filter pages
+    bookmarks = Bookmark.query.filter_by(user_id= current_user).paginate(page=page, per_page=per_page)
+  
+
+    # creating an empty list to store data 
+    #and appending retrieved data to the list  to be sent back as json to the api 
     data = []
-
-    for bookmark in bookmarks:
+    for bookmark in bookmarks.items:
         data.append(
             {
             'id': bookmark.id,
@@ -69,6 +76,80 @@ def get_bookmark():
             'updated_at': bookmark.updated_at,
             }
         )
+    meta= {
+        "page": bookmarks.page,
+        "pages": bookmarks.pages,
+        "total_count": bookmarks.total,
+        "prev_page": bookmarks.prev_num,
+        "next_page": bookmarks.next_num,
+        "has_next": bookmarks.has_next,
+        "has_prev": bookmarks.has_prev,
+    }
     return jsonify({
-        'data':data
+        'data':data,
+        'meta':meta
     }), HTTP_200_OK
+
+
+
+@bookmarks.get('/<int:id>')
+@jwt_required()
+def get_singlebookmark(id):
+    current_user = get_jwt_identity()
+
+    bookmark = Bookmark.query.filter_by(user_id=current_user, id=id).first()
+
+    # if bookmark does not exist send error message
+    if not bookmark:
+        return jsonify({
+            'error':'Item not found'
+        }), HTTP_404_NOT_FOUND
+
+    return jsonify({
+            'id': bookmark.id,
+            'url': bookmark.url,
+            'short_url': bookmark.short_url,
+            'visit':bookmark.visits,
+            'body': bookmark.body,
+            'created_at': bookmark.created_at,
+            'updated_at': bookmark.updated_at,
+        }), HTTP_200_OK
+
+@bookmarks.put('/<int:id>')
+@jwt_required()
+def update_bookmark(id):
+    current_user=get_jwt_identity()
+    body = request.get_json().get('body')
+    url = request.get_json().get('url')
+
+    bookmark = Bookmark.query.filter_by(user_id=current_user, id=id).first()
+    
+    # To check if url is valid
+    if not validators.url(url):
+        return jsonify({
+            'error': 'Enter a valid url'
+        }),     HTTP_400_BAD_REQUEST
+
+    if not bookmark:
+        return jsonify({
+            'error':'Item not found'
+        }), HTTP_404_NOT_FOUND
+   
+    else:
+        bookmark.body = body
+        bookmark.url = url
+        # bookmark.updated_at = datetime.now()
+
+        db.session.commit()
+
+    return jsonify({
+            'id': bookmark.id,
+            'url': bookmark.url,
+            'short_url': bookmark.short_url,
+            'visit':bookmark.visits,
+            'body': bookmark.body,
+            'created_at': bookmark.created_at,
+            'updated_at': bookmark.updated_at,
+        }), HTTP_200_OK
+
+        
