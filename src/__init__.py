@@ -1,8 +1,10 @@
 import os
-from flask import Flask 
+from flask import Flask, jsonify
+from src.url import url
 from src.auth import auth
 from src.bookmarks import bookmarks
 from src.database import db
+from src.constants.http_status_codes import *
 from flask_jwt_extended import JWTManager
 
 
@@ -19,11 +21,25 @@ def create_app(test_config=None):
     else:
         app.config.from_mapping(test_config)
 
-
-    db.app=app
     db.init_app(app)
 
     JWTManager(app)
+    # Registering blueprints
     app.register_blueprint(auth)
     app.register_blueprint(bookmarks)
+    app.register_blueprint(url)
+   
+    # Routes to handle error exceptions
+    @app.errorhandler(HTTP_404_NOT_FOUND)
+    def handle_404(e):
+        return jsonify({
+            'error':"Not found",
+        }), HTTP_404_NOT_FOUND
+
+    @app.errorhandler(HTTP_500_INTERNAL_SERVER_ERROR)
+    def handle_500(e):
+        return jsonify({
+            'error':"Something went wrong, we are working on it"
+        }), HTTP_500_INTERNAL_SERVER_ERROR
+
     return app 
