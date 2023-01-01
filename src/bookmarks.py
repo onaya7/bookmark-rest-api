@@ -3,12 +3,14 @@ from src.constants.http_status_codes import *
 from src.database import Bookmark, db
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import validators
+from flasgger import swag_from
 
 bookmarks = Blueprint("bookmarks", __name__, url_prefix="/api/v1/bookmarks")
 
 
 @bookmarks.post('/')
 @jwt_required()
+@swag_from("./docs/bookmark/add_bookmark.yaml")
 def add_bookmark():
     current_user = get_jwt_identity()
     if request.method == 'POST':
@@ -170,6 +172,7 @@ def delete_bookmark(id):
 
 @bookmarks.get('/stats')
 @jwt_required()
+@swag_from("./docs/bookmark/stats.yaml")
 def get_stat():
     current_user = get_jwt_identity()
 

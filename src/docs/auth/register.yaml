@@ -16,17 +16,17 @@ parameters:
       properties:
         email:
           type: "email"
-          example: "dev_onaya@gmail.com"
+          example: "admin@gmail.com"
         username:
           type: "username"
-          example: "dev_onaya"
+          example: "admin"
         password:
           type: "string"
           format: password
-          example: "********"
+          example: "admin1234"
 responses:
   201:
-    description: When a user successfully logs in
+    description: When a user successfully Register
 
   400:
     description: Fails to Register due to bad request data

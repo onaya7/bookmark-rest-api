@@ -1,0 +1,31 @@
+Adding a bookmark 
+---
+tags:
+  - Bookmarks
+parameters:
+  - name: body
+    description: This body adds new bookmark 
+    in: body
+    required: true
+    schema:
+      type: object
+      required:
+        - "body"
+        - "url"
+      properties:
+        body:
+          type: "string"
+          example: "This is a link to gmail"
+        url:
+          type: "string"
+          exmple: "https://mail.google.com"
+
+responses:
+  201:
+    description: When a Bookmark is added successfully
+
+  400:
+    description: Fails to Add a new bookmark due to bad request data
+
+  409:
+    description: Fails to Add a new bookmark due to conflict from existing data.

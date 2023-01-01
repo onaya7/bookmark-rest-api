@@ -7,6 +7,7 @@ from src.constants.http_status_codes import *
 from flask_jwt_extended import JWTManager
 from flasgger import Swagger, swag_from
 from src.config.swagger import template, swagger_config
+from flask_cors import CORS
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
@@ -34,13 +35,16 @@ def create_app(test_config=None):
     #configure Swagger
     Swagger(app, template=template, config=swagger_config)
 
+    #configure Cors
+    CORS(app)
+
     # Registering blueprints
     app.register_blueprint(auth)
     app.register_blueprint(bookmarks)
    
     # Route to handle short_url 
     @app.get('/<short_url>')
-    @swag_from('./short_url.yaml')
+    @swag_from('./docs/short_url.yaml')
     def redirect_to_url(short_url):
         bookmark = Bookmark.query.filter_by(short_url=short_url).first_or_404()
         
@@ -48,6 +52,7 @@ def create_app(test_config=None):
             bookmark.visits = bookmark.visits +  1
             db.session.commit()
             return redirect(bookmark.url)
+
     # Routes to handle error exceptions
     @app.errorhandler(HTTP_404_NOT_FOUND)
     def handle_404(e):
