@@ -1,7 +1,7 @@
 Redirect to a short url
 ---
 tags:
-  - Bookmarks
+  - Short_url
 parameters:
   - in: path
     name: short_url

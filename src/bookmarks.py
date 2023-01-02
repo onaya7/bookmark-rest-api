@@ -49,6 +49,7 @@ def add_bookmark():
 
 @bookmarks.get('/')
 @jwt_required()
+@swag_from("./docs/bookmark/bookmark.yaml")
 def get_bookmark():
     # get current user from jwt
     current_user = get_jwt_identity()
@@ -95,6 +96,7 @@ def get_bookmark():
 
 @bookmarks.get('/<int:id>')
 @jwt_required()
+@swag_from("./docs/bookmark/singlebookmark.yaml")
 def get_singlebookmark(id):
     current_user = get_jwt_identity()
 
@@ -118,6 +120,7 @@ def get_singlebookmark(id):
 
 @bookmarks.put('/<int:id>')
 @jwt_required()
+@swag_from("./docs/bookmark/updatebookmark.yaml")
 def update_bookmark(id):
     current_user=get_jwt_identity()
     body = request.get_json().get('body')
@@ -153,6 +156,7 @@ def update_bookmark(id):
 
 @bookmarks.delete('/<int:id>')
 @jwt_required()
+@swag_from("./docs/bookmark/deletebookmark.yaml")
 def delete_bookmark(id):
     current_user = get_jwt_identity()
 
@@ -188,7 +192,7 @@ def get_stat():
             'short_url': item.short_url,
         }
 
-    data.append(new_link)
+        data.append(new_link)
 
     return jsonify({
         'data':data

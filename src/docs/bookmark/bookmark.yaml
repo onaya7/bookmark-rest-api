@@ -1,0 +1,15 @@
+Get a list of  bookmark 
+---
+tags:
+  - Bookmarks
+parameters:
+  - name: Authorization
+    description: This body gets an array of all bookmarks
+    in: header
+    required: true
+responses:
+  200:
+    description: An array of all Bookmark
+
+  401:
+     description: Unauthorized error

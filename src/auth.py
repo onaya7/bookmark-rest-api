@@ -109,6 +109,7 @@ def me():
 
 @auth.get ('/token/refresh')
 @jwt_required(refresh=True)
+@swag_from("./docs/auth/token_refresh.yaml")
 def refresh_users_token():
     identity = get_jwt_identity()
     access = create_access_token(identity=identity)
@@ -116,3 +117,4 @@ def refresh_users_token():
     return jsonify({
         'access':access
     }), HTTP_200_OK
+

@@ -2,6 +2,7 @@ import os
 from flask import Flask, jsonify, redirect
 from src.auth import auth
 from src.bookmarks import bookmarks
+from src.short_url import short_url
 from src.database import db, Bookmark
 from src.constants.http_status_codes import *
 from flask_jwt_extended import JWTManager
@@ -10,7 +11,7 @@ from src.config.swagger import template, swagger_config
 from flask_cors import CORS
 
 def create_app(test_config=None):
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__, instance_relative_config=True )
 
     if test_config is None:
         app.config.from_mapping(
@@ -41,17 +42,9 @@ def create_app(test_config=None):
     # Registering blueprints
     app.register_blueprint(auth)
     app.register_blueprint(bookmarks)
+    app.register_blueprint(short_url)
    
-    # Route to handle short_url 
-    @app.get('/<short_url>')
-    @swag_from('./docs/short_url.yaml')
-    def redirect_to_url(short_url):
-        bookmark = Bookmark.query.filter_by(short_url=short_url).first_or_404()
-        
-        if bookmark:
-            bookmark.visits = bookmark.visits +  1
-            db.session.commit()
-            return redirect(bookmark.url)
+    
 
     # Routes to handle error exceptions
     @app.errorhandler(HTTP_404_NOT_FOUND)

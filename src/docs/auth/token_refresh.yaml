@@ -1,0 +1,23 @@
+Refreshes an access token
+---
+tags:
+  - Authentication
+parameters:
+  - in: header
+    name: Authorization
+    description: This body takes in a refresh token The refresh token is sent and returned via cookies.
+    required: true
+    schema:
+      type: object
+      required:
+        - "jwtToken"
+     
+responses:
+  200:
+    description: a JWT access token was created succesfully
+    headers:
+            Set-Cookie:
+              description: "`refreshToken`"
+              schema:
+                type: string
+                example: refreshToken=51872eca5efedcf424db4cf5afd16a9d00ad25b743a034c9c221afc85d18dcd5e4ad6e3f08607550; Path=/; Expires=Tue, 16 Jun 2020 09:14:17 GMT; HttpOnly
