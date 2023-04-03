@@ -197,4 +197,3 @@ def get_stat():
     return jsonify({
         'data':data
     }), HTTP_200_OK
-        

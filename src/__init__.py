@@ -1,12 +1,12 @@
 import os
-from flask import Flask, jsonify, redirect
+from flask import Flask, jsonify
 from src.auth import auth
 from src.bookmarks import bookmarks
 from src.short_url import short_url
-from src.database import db, Bookmark
+from src.database import db
 from src.constants.http_status_codes import *
 from flask_jwt_extended import JWTManager
-from flasgger import Swagger, swag_from
+from flasgger import Swagger
 from src.config.swagger import template, swagger_config
 from flask_cors import CORS
 
