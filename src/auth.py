@@ -96,6 +96,37 @@ def login():
         'error':"Wrong credentials"
     }), HTTP_401_UNAUTHORIZED
  
+@auth.post('/forgotpassword')
+def forgotpassword():
+    email = request.json['email']
+    password = request.json['password']
+    
+    pwd_hash = generate_password_hash(password)
+    
+    #check if email exist in db
+    if not validators.email(email):
+        return jsonify({
+            'err':"This email is not valid"
+        }), HTTP_400_BAD_REQUEST
+        
+    user = User.query.filter_by(email=email).first()
+    
+    
+    if user is None:
+        return jsonify({
+            'err':"This user does not exist"
+        }), HTTP_400_BAD_REQUEST
+    elif user:
+        # filter by the user and change the password of the user 
+        user.password = pwd_hash
+        db.session.commit()
+        
+        return jsonify({
+            'message':"password changed successfully"
+        }), HTTP_200_OK
+
+               
+
 @auth.get("/me")
 @jwt_required()
 def me():
@@ -106,6 +137,8 @@ def me():
             'username': user.username,
             'email': user.email
    }), HTTP_200_OK
+
+
 
 @auth.get ('/token/refresh')
 @jwt_required(refresh=True)

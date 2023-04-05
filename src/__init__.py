@@ -9,6 +9,7 @@ from flask_jwt_extended import JWTManager
 from flasgger import Swagger
 from src.config.swagger import template, swagger_config
 from flask_cors import CORS
+from flask_migrate import Migrate
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True )
@@ -29,6 +30,7 @@ def create_app(test_config=None):
         app.config.from_mapping(test_config)
 
     db.init_app(app)
+    
 
     # configure JWTManager
     JWTManager(app)
@@ -39,6 +41,10 @@ def create_app(test_config=None):
     #configure Cors
     CORS(app)
 
+    # configure Flask-Migrate
+    Migrate(app, db)
+    
+    
     # Registering blueprints
     app.register_blueprint(auth)
     app.register_blueprint(bookmarks)
