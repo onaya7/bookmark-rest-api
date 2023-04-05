@@ -97,6 +97,7 @@ def login():
     }), HTTP_401_UNAUTHORIZED
  
 @auth.post('/forgotpassword')
+@swag_from("./docs/auth/forgotpassword.yaml")
 def forgotpassword():
     email = request.json['email']
     password = request.json['password']
