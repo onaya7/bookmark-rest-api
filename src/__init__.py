@@ -10,6 +10,7 @@ from flasgger import Swagger
 from src.config.swagger import template, swagger_config
 from flask_cors import CORS
 from flask_migrate import Migrate
+from flask_wtf.csrf import CSRFProtect
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True )
@@ -20,6 +21,7 @@ def create_app(test_config=None):
             SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI"),
             SQLALCHEMY_TRACK_MODIFICATIONS = os.environ.get("SQLALCHEMY_TRACK_MODIFICATIONS"),
             JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY"),
+            WTF_CSRF_SECRET_KEY = os.environ.get("WTF_CSRF_SECRET_KEY"),
 
             SWAGGER ={
                 'title':"Bookmark API",
@@ -43,6 +45,10 @@ def create_app(test_config=None):
 
     # configure Flask-Migrate
     Migrate(app, db)
+    
+    #configure CSRF
+    csrf=CSRFProtect()
+    csrf.init_app(app)
     
     
     # Registering blueprints
