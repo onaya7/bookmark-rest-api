@@ -76,6 +76,7 @@ def login():
     if user:
         # check if user password is correct
         is_pass_correct = check_password_hash(user.password, password)
+        
        
 
         # if user password is correct 
