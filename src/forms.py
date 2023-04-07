@@ -1,22 +1,32 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+from wtforms import StringField, PasswordField
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Regexp
 from src.database import User
 
+
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=5, max=20)])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired(), EqualTo('confirm_password')])
-    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
-    csrf_token = StringField('csrf_token')
+    username = StringField('Username', validators=[
+                           DataRequired(), Length(min=4, max=25)])
+    email = StringField('Email', validators=[DataRequired(), Email(), Length(
+        min=6, max=35, message='Little short for an email address?')])
+    password = PasswordField('Password', validators=[DataRequired(), EqualTo('confirm_password'), Length(min=5, max=50, message="Password is too short"), Regexp(r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+-=]).{8,}$',
+                                                                                                                                                                 message='Password must include at least one uppercase letter, one lowercase letter, one number, and one special character')])
+    confirm_password = PasswordField(
+        'Confirm Password', validators=[DataRequired()])
+
     
-    def create_csrf_token(self, token):
-        self.csrf_token = token
-    
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if user:
+            raise ValidationError(
+                "This username is already in use by another user"
+            )
+        
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user:
-            raise ValidationError("This email is taken. Please choose a different one")
-    # def validate_password(self, email):
-        
-    
+            raise ValidationError(
+                "This email is taken. Please choose a different one")
+
+
+# change password form

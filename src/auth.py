@@ -17,7 +17,8 @@ from flask_jwt_extended import (
 )
 from flasgger import swag_from
 from src.forms import RegistrationForm
-from flask_wtf.csrf import generate_csrf
+from flask_wtf import csrf
+
 
 auth = Blueprint("auth", __name__, url_prefix="/api/v1/auth")
 
@@ -26,51 +27,44 @@ auth = Blueprint("auth", __name__, url_prefix="/api/v1/auth")
 @swag_from("./docs/auth/register.yaml")
 def register():
     form = RegistrationForm()
-    
-    csrf_token = generate_csrf()
-    if request.is_json:
-        username = request.json["username"]
-        email = request.json["email"]
-        password = request.json["password"]
-        confirm_password = request.json["confirm_password"]
-        
-        
-        
-        if form.validate():
-            form.username.data = username
-            form.email.data = email
-            form.password.data = password
-            form.confirm_password.data = confirm_password
-            form.create_csrf_token(csrf_token)
-            
-            
-            username = form.username.data
-            email = form.email.data
-            password = form.password.data
-            confirm_password = form.confirm_password.data
-            
-            print(username)
-            print(email)
-            return (
-                jsonify(
-                    {"message": "User created", "user": {"username": username, "email": email}}
-                )),HTTP_201_CREATED
-    
-        # user = User.query.filter_by(username=form.username.data).first()
-        # if user:
-        #     return jsonify({"err": "User already exist"}), HTTP_400_BAD_REQUEST
-        # user = User(username=form.username.data, email=form.email.data)
-        # user.create_password_hash(password)
-        # db.session.add(user)
-        # db.session.commit()
-        else:
-            return jsonify({
-                'err': form.errors
-            }), HTTP_400_BAD_REQUEST
+    # get request body
+    username = request.json["username"]
+    email = request.json["email"]
+    password = request.json["password"]
+    confirm_password = request.json["confirm_password"]
+
+    # checks if form validation is successfull
+    if form.validate():
+        form.username.data = username
+        form.email.data = email
+        form.password.data = password
+        form.confirm_password.data = confirm_password
+
+        username = form.username.data
+        email = form.email.data
+        password = form.password.data
+        confirm_password = form.confirm_password.data
+
+        user = User(username=username, email=email, password=password)
+        user.create_password_hash(password)
+        db.session.add(user)
+        db.session.commit()
+
+        return (
+            jsonify(
+                {"message": "User created successfully ", "user": {
+                    "username": username, "email": email}}
+            )), HTTP_201_CREATED
+    else:
+        return jsonify({
+            'error': form.errors
+        }), HTTP_400_BAD_REQUEST
+
 
 @auth.post("/login")
 @swag_from("./docs/auth/login.yaml")
 def login():
+
     # variables to get user details from json
     email = request.json.get("email", "")
     password = request.json.get("password", "")
@@ -78,12 +72,18 @@ def login():
     # To check if user exist in db
     # first filter by the email if the user with that email already exist
     user = User.query.filter_by(email=email).first()
-
+    
     # if user exists
     if user:
         # check if user password is correct
         is_pass_correct = check_password_hash(user.password, password)
 
+        if not is_pass_correct:
+            return(
+                jsonify({
+                    "error": "You seem to have input an incorrect password"
+                }),HTTP_401_UNAUTHORIZED
+            )
         # if user password is correct
         if is_pass_correct:
             refresh = create_refresh_token(identity=user.id)
@@ -103,7 +103,7 @@ def login():
                 HTTP_200_OK,
             )
 
-    return jsonify({"error": "Wrong credentials"}), HTTP_401_UNAUTHORIZED
+    return jsonify({"error": "Username and Password are incorrect"}), HTTP_401_UNAUTHORIZED
 
 
 @auth.post("/forgotpassword")
