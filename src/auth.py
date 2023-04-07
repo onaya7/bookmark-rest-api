@@ -7,7 +7,7 @@ from src.constants.http_status_codes import (
     HTTP_401_UNAUTHORIZED,
 )
 from src.database import db, User
-from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.security import check_password_hash
 import validators
 from flask_jwt_extended import (
     jwt_required,
@@ -16,8 +16,8 @@ from flask_jwt_extended import (
     create_refresh_token,
 )
 from flasgger import swag_from
-from src.forms import RegistrationForm
-from flask_wtf import csrf
+from src.forms import RegistrationForm, PasswordresetForm
+
 
 
 auth = Blueprint("auth", __name__, url_prefix="/api/v1/auth")
@@ -47,6 +47,7 @@ def register():
 
         user = User(username=username, email=email, password=password)
         user.create_password_hash(password)
+        print(user.password)
         db.session.add(user)
         db.session.commit()
 
@@ -72,18 +73,15 @@ def login():
     # To check if user exist in db
     # first filter by the email if the user with that email already exist
     user = User.query.filter_by(email=email).first()
+    print(user.password)
     
     # if user exists
     if user:
         # check if user password is correct
-        is_pass_correct = check_password_hash(user.password, password)
-
-        if not is_pass_correct:
-            return(
-                jsonify({
-                    "error": "You seem to have input an incorrect password"
-                }),HTTP_401_UNAUTHORIZED
-            )
+        
+        is_pass_correct = check_password_hash(password, user.password)
+        print(is_pass_correct)
+        
         # if user password is correct
         if is_pass_correct:
             refresh = create_refresh_token(identity=user.id)
@@ -103,34 +101,50 @@ def login():
                 HTTP_200_OK,
             )
 
+            
+        # if not is_pass_correct:
+        #     return(
+        #         jsonify({
+        #             "error": "You seem to have input an incorrect password"
+        #         }),HTTP_401_UNAUTHORIZED
+        #     )
+
     return jsonify({"error": "Username and Password are incorrect"}), HTTP_401_UNAUTHORIZED
 
 
-@auth.post("/forgotpassword")
-@swag_from("./docs/auth/forgotpassword.yaml")
-def forgotpassword():
+@auth.post("/passwordreset")
+@swag_from("./docs/auth/password_reset.yaml")
+def passwordreset():
     email = request.json["email"]
     password = request.json["password"]
-    confirm_password = request.json["password"]
+    confirm_password = request.json["confirm_password"]
+    
+    form = PasswordresetForm()
 
-    pwd_hash = generate_password_hash(password)
-
-    # check if email exist in db
-    if not validators.email(email):
-        return jsonify({"err": "This email is not valid"}), HTTP_400_BAD_REQUEST
-
-    user = User.query.filter_by(email=email).first()
-
-    if user is None:
-        return jsonify({"err": "This user does not exist"}), HTTP_400_BAD_REQUEST
-    elif user:
-        # filter by the user and change the password of the user
-        user.password = pwd_hash
-        db.session.commit()
-
-        return jsonify({"message": "password changed successfully"}), HTTP_200_OK
-
-
+    form.email.data = email
+    form.password.data = password
+    form.confirm_password.data = confirm_password
+    
+    email = form.email.data
+    password = form.password.data
+    confirm_password = form.confirm_password.data
+    
+    if form.validate():
+        user = User.query.filter_by(email=email).first()
+        if user:
+            user.create_password_hash(password)
+            return(
+                jsonify({
+                    "message":"password changed successfully"
+                })
+            ), HTTP_200_OK
+    return(
+        jsonify({
+            "error":form.errors
+        })
+    ), HTTP_400_BAD_REQUEST
+        
+        
 @auth.get("/me")
 @jwt_required()
 def me():
@@ -148,3 +162,4 @@ def refresh_users_token():
     access = create_access_token(identity=identity)
 
     return jsonify({"access": access}), HTTP_200_OK
+
