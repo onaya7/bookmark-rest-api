@@ -11,6 +11,7 @@ from src.config.swagger import template, swagger_config
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_wtf import CSRFProtect
+from flask_bcrypt import Bcrypt
 
 
 def create_app(test_config=None):
@@ -49,7 +50,8 @@ def create_app(test_config=None):
     # configure CSRF
     app.config['WTF_CSRF_ENABLED'] = False
     CSRFProtect(app)
-
+    
+    
     # Registering blueprints
     app.register_blueprint(auth)
     app.register_blueprint(bookmarks)

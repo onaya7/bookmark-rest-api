@@ -3,6 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import string
 from random import choices
+from src.instance import bcrypt
 
 db = SQLAlchemy()
 
@@ -16,7 +17,7 @@ class User(db.Model):
     bookmarks = db.relationship('Bookmark', backref='user')
     
     def create_password_hash(self, password):
-        self.password = generate_password_hash(password)
+        self.password = bcrypt.generate_password_hash(password)
         
     def __repr__(self):
         return f"User('id:{self.id}','username:{self.username}')"
