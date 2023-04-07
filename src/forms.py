@@ -27,7 +27,11 @@ class RegistrationForm(FlaskForm):
             raise ValidationError(
                 "This email is taken. Please choose a different one")
 
-
+class LoginForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email(), Length(
+        min=6, max=35, message='Little short for an email address?')])
+    password = PasswordField('Password', validators=[DataRequired()])
+    
 class PasswordresetForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email(), Length(
         min=6, max=35, message='Little short for an email address?')])

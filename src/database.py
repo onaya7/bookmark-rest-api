@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import string
 from random import choices
@@ -17,7 +17,7 @@ class User(db.Model):
     
     def create_password_hash(self, password):
         self.password = generate_password_hash(password)
-             
+        
     def __repr__(self):
         return f"User('id:{self.id}','username:{self.username}')"
 

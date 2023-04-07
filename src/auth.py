@@ -16,7 +16,7 @@ from flask_jwt_extended import (
     create_refresh_token,
 )
 from flasgger import swag_from
-from src.forms import RegistrationForm, PasswordresetForm
+from src.forms import RegistrationForm, LoginForm,  PasswordresetForm
 
 
 
@@ -61,57 +61,59 @@ def register():
             'error': form.errors
         }), HTTP_400_BAD_REQUEST
 
-
+        
 @auth.post("/login")
 @swag_from("./docs/auth/login.yaml")
 def login():
-
-    # variables to get user details from json
-    email = request.json.get("email", "")
-    password = request.json.get("password", "")
-
-    # To check if user exist in db
-    # first filter by the email if the user with that email already exist
-    user = User.query.filter_by(email=email).first()
-    print(user.password)
     
-    # if user exists
-    if user:
-        # check if user password is correct
+    form = LoginForm()
+    email = request.json["email"]
+    password = request.json["password"]
+    
+    if form.validate():
+        form.email.data = email
+        form.password.data = password
+
+        email = form.email.data
+        password = form.password.data
         
-        is_pass_correct = check_password_hash(password, user.password)
+        # To check if user exist in db
+        # first filter by the email if the user with that email already exist
+        user = User.query.filter_by(email=email).first()
+        is_pass_correct = check_password_hash(user.password, password)
+        
+        print(email)
+        print(user.email)
+        print(password)
         print(is_pass_correct)
-        
-        # if user password is correct
-        if is_pass_correct:
-            refresh = create_refresh_token(identity=user.id)
-            access = create_access_token(identity=user.id)
+        # if user exists
+        if user:
+            # if user password is correct
+            if is_pass_correct:
+                refresh = create_refresh_token(identity=user.id)
+                access = create_access_token(identity=user.id)
 
-            return (
-                jsonify(
-                    {
-                        "user": {
-                            "refresh": refresh,
-                            "access": access,
-                            "username": user.username,
-                            "email": user.email,
+                return (
+                    jsonify(
+                        {
+                            "user": {
+                                "refresh": refresh,
+                                "access": access,
+                                "username": user.username,
+                                "email": user.email,
+                            }
                         }
-                    }
-                ),
-                HTTP_200_OK,
-            )
-
-            
-        # if not is_pass_correct:
-        #     return(
-        #         jsonify({
-        #             "error": "You seem to have input an incorrect password"
-        #         }),HTTP_401_UNAUTHORIZED
-        #     )
-
+                    ),
+                    HTTP_200_OK,
+                )
     return jsonify({"error": "Username and Password are incorrect"}), HTTP_401_UNAUTHORIZED
 
-
+# if not is_pass_correct:
+#     return(
+#         jsonify({
+#             "error": "You seem to have input an incorrect password"
+#         }),HTTP_401_UNAUTHORIZED
+#     )
 @auth.post("/passwordreset")
 @swag_from("./docs/auth/password_reset.yaml")
 def passwordreset():
