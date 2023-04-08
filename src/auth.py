@@ -83,16 +83,16 @@ def login():
     if user and is_pass_correct:
 
         # if user and password is correct
-
+        access = create_access_token(identity=user.id , fresh=True)
         refresh = create_refresh_token(identity=user.id)
-        access = create_access_token(identity=user.id)
+       
 
         return (
             jsonify(
                 {
                     "user": {
-                        "refresh": refresh,
                         "access": access,
+                        "refresh": refresh,
                         "username": user.username,
                         "email": user.email,
                     }
@@ -155,6 +155,6 @@ def me():
 @swag_from("./docs/auth/token_refresh.yaml")
 def refresh_users_token():
     identity = get_jwt_identity()
-    access = create_access_token(identity=identity)
+    access = create_access_token(identity=identity, fresh=False)
 
     return jsonify({"access": access}), HTTP_200_OK
