@@ -1,7 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import string
 from random import choices
+from src.instance import bcrypt
 
 db = SQLAlchemy()
 
@@ -13,7 +15,10 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now())
     updated_at = db.Column(db.DateTime, onupdate=datetime.now())
     bookmarks = db.relationship('Bookmark', backref='user')
-
+    
+    def create_password_hash(self, password):
+        self.password = bcrypt.generate_password_hash(password)
+        
     def __repr__(self):
         return f"User('id:{self.id}','username:{self.username}')"
 
