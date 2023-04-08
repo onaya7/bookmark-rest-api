@@ -11,17 +11,22 @@ parameters:
       type: object
       required:
         - "email"
-        - "password"
         - "username"
+        - "password"
+        - "confirm_password"
       properties:
         email:
-          type: "email"
+          type: email
           example: "admin@gmail.com"
         username:
-          type: "username"
+          type: username
           example: "admin"
         password:
-          type: "string"
+          type: password 
+          format: password
+          example: "Admin1$"
+        confirm_password:
+          type: password
           format: password
           example: "Admin1$"
 responses:

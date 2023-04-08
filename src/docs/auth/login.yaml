@@ -19,7 +19,7 @@ parameters:
         password:
           type: "string"
           format: password
-          example: "admin1234"
+          example: "Admin1$"
 responses:
   200:
     description: When a user successfully logs in

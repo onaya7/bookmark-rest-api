@@ -7,7 +7,6 @@ from src.constants.http_status_codes import (
     HTTP_401_UNAUTHORIZED,
 )
 from src.database import db, User
-from werkzeug.security import check_password_hash
 from flask_jwt_extended import (
     jwt_required,
     get_jwt_identity,
@@ -17,10 +16,11 @@ from flask_jwt_extended import (
 from flasgger import swag_from
 from src.forms import RegistrationForm, LoginForm,  PasswordresetForm
 from src.instance import bcrypt
-
+from flask_bcrypt import generate_password_hash
 
 
 auth = Blueprint("auth", __name__, url_prefix="/api/v1/auth")
+
 
 @auth.post("/register")
 @swag_from("./docs/auth/register.yaml")
@@ -43,7 +43,7 @@ def register():
         email = form.email.data
         password = form.password.data
         confirm_password = form.confirm_password.data
-        
+
         user = User(username=username, email=email, password=password)
         user.create_password_hash(password)
         print(user.password)
@@ -60,56 +60,50 @@ def register():
             'error': form.errors
         }), HTTP_400_BAD_REQUEST
 
-        
+
 @auth.post("/login")
 @swag_from("./docs/auth/login.yaml")
 def login():
-    
+
     email = request.json["email"]
     password = request.json["password"]
+
+    # To check if user exist in db
+    # first filter by the email if the user with that email already exist
+    user = User.query.filter_by(email=email).first()
     
-    form = LoginForm()
-    if form.validate():
-        # To check if user exist in db
-        # first filter by the email if the user with that email already exist
-        user = User.query.filter_by(email=email).first()
-        form.email.data = email
-        form.password.data = password
-
-        email = form.email.data
-        password = form.password.data
-        
-        is_pass_correct = bcrypt.check_password_hash(user.password, password)
-        # if user exists
-        if user:
-            
-            if is_pass_correct:
-            
-                # if user password is correct
-            
-                refresh = create_refresh_token(identity=user.id)
-                access = create_access_token(identity=user.id)
-
-                return (
-                    jsonify(
-                        {
-                            "user": {
-                                "refresh": refresh,
-                                "access": access,
-                                "username": user.username,
-                                "email": user.email,
-                            }
-                        }
-                    ),
-                    HTTP_200_OK,
-                )
-            return jsonify({
-            "error":"Wrong password"
-        })
+    if not user:
         return jsonify({
-            "error":"Invalid username"
-        })
-    return jsonify({form.errors }), HTTP_400_BAD_REQUEST
+            "error": "This user does not exist try registering to get access"
+        }), HTTP_400_BAD_REQUEST
+        
+    is_pass_correct = bcrypt.check_password_hash(user.password, password)
+        
+    # if user exists and passwords matches hashed password
+    if user and is_pass_correct:
+
+        # if user and password is correct
+
+        refresh = create_refresh_token(identity=user.id)
+        access = create_access_token(identity=user.id)
+
+        return (
+            jsonify(
+                {
+                    "user": {
+                        "refresh": refresh,
+                        "access": access,
+                        "username": user.username,
+                        "email": user.email,
+                    }
+                }
+            ),
+            HTTP_200_OK,
+        )
+
+    return jsonify({
+        "error": "Invalid password for this account, passwords might be case sensitive"
+    }),HTTP_401_UNAUTHORIZED
 
 
 @auth.post("/passwordreset")
@@ -118,33 +112,35 @@ def passwordreset():
     email = request.json["email"]
     password = request.json["password"]
     confirm_password = request.json["confirm_password"]
-    
+
     form = PasswordresetForm()
 
     form.email.data = email
     form.password.data = password
     form.confirm_password.data = confirm_password
-    
+
     email = form.email.data
     password = form.password.data
     confirm_password = form.confirm_password.data
-    
+
     if form.validate():
         user = User.query.filter_by(email=email).first()
         if user:
-            user.create_password_hash(password)
-            return(
+            new_password = generate_password_hash(password)
+            user.password = new_password
+            db.session.commit()
+            return (
                 jsonify({
-                    "message":"password changed successfully"
+                    "message": "password changed successfully"
                 })
             ), HTTP_200_OK
-    return(
+    return (
         jsonify({
-            "error":form.errors
+            "error": form.errors
         })
     ), HTTP_400_BAD_REQUEST
-        
-        
+
+
 @auth.get("/me")
 @jwt_required()
 def me():
@@ -162,4 +158,3 @@ def refresh_users_token():
     access = create_access_token(identity=identity)
 
     return jsonify({"access": access}), HTTP_200_OK
-
