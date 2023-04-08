@@ -9,7 +9,7 @@ bookmarks = Blueprint("bookmarks", __name__, url_prefix="/api/v1/bookmarks")
 
 
 @bookmarks.post('/')
-@jwt_required()
+@jwt_required(fresh=True)
 @swag_from("./docs/bookmark/add_bookmark.yaml")
 def add_bookmark():
     current_user = get_jwt_identity()
@@ -48,7 +48,7 @@ def add_bookmark():
         }), HTTP_201_CREATED
 
 @bookmarks.get('/')
-@jwt_required()
+@jwt_required(fresh=True)
 @swag_from("./docs/bookmark/bookmark.yaml")
 def get_bookmark():
     # get current user from jwt
@@ -95,7 +95,7 @@ def get_bookmark():
 
 
 @bookmarks.get('/<int:id>')
-@jwt_required()
+@jwt_required(fresh=True)
 @swag_from("./docs/bookmark/singlebookmark.yaml")
 def get_singlebookmark(id):
     current_user = get_jwt_identity()
@@ -119,7 +119,7 @@ def get_singlebookmark(id):
         }), HTTP_200_OK
 
 @bookmarks.put('/<int:id>')
-@jwt_required()
+@jwt_required(fresh=True)
 @swag_from("./docs/bookmark/updatebookmark.yaml")
 def update_bookmark(id):
     current_user=get_jwt_identity()
@@ -155,7 +155,7 @@ def update_bookmark(id):
         }), HTTP_200_OK
 
 @bookmarks.delete('/<int:id>')
-@jwt_required()
+@jwt_required(fresh=True)
 @swag_from("./docs/bookmark/deletebookmark.yaml")
 def delete_bookmark(id):
     current_user = get_jwt_identity()
@@ -175,7 +175,7 @@ def delete_bookmark(id):
         }), HTTP_200_OK
 
 @bookmarks.get('/stats')
-@jwt_required()
+@jwt_required(fresh=True)
 @swag_from("./docs/bookmark/stats.yaml")
 def get_stat():
     current_user = get_jwt_identity()
