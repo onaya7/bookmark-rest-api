@@ -2,12 +2,12 @@ Get stats about bookmarks
 ---
 tags:
   - Bookmarks
-
-parameters:
-  - in: header
-    name: Authorization
-    required: true
-
+consumes:
+- "application/json"
+produces:
+- "application/json"
+security:
+- JWTAuth: []
 responses:
   200:
     description: Bookmarks stats

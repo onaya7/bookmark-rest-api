@@ -4,8 +4,8 @@ template = {
     "title": "Bookmark API",
     "description": "Bookmark API for my data",
     "contact": {
-      "responsibleOrganization": "ME",
-      "responsibleDeveloper": "Me",
+      "responsibleOrganization": "Dev_onaya",
+      "responsibleDeveloper": "Samuel Ayano",
       "email": "samuelayano7@gmail.com",
       "url": "https://www.linkedin.com/in/samuel-ayano-1336bb247/",
     },
@@ -19,12 +19,15 @@ template = {
     "https"
   ],
    "securityDefinitions": {
-        "Bearer": {
+            "JWTAuth": {
             "type": "apiKey",
+            "scheme": "bearer",
             "name": "Authorization",
+            "bearerFormat": "JWT",
             "in": "header",
             "description": "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\""
-        }
+        },
+        
     },
   "operationId": "getmyData"
 }

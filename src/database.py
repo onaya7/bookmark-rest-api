@@ -20,7 +20,7 @@ class User(db.Model):
         self.password = bcrypt.generate_password_hash(password)
         
     def __repr__(self):
-        return f"User('id:{self.id}','username:{self.username}')"
+        return f"User('id:{self.id}')"
 
 class Bookmark(db.Model):
         id = db.Column(db.Integer, primary_key=True)

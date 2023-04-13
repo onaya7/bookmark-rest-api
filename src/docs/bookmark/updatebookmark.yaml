@@ -2,13 +2,16 @@ Updating a bookmark with a specified ID
 ---
 tags:
   - Bookmarks
+consumes:
+- "application/json"
+produces:
+- "application/json"
+security:
+- JWTAuth: []
 parameters:
   - name: id
     in: path
     required: true 
-  - name: Authorization
-    in: header
-    required: true
   - name: body
     in: body
     description: This body updates an existing bookmark 

@@ -2,10 +2,13 @@ Adding a bookmark
 ---
 tags:
   - Bookmarks
+consumes:
+- "application/json"
+produces:
+- "application/json"
+security:
+- JWTAuth: []
 parameters:
-  - name: Authorization
-    in: header
-    required: true
   - name: body
     in: body
     description: This body adds new bookmark 
@@ -20,7 +23,7 @@ parameters:
           type: "string"
           example: "This is a link to gmail"
         url:
-          type: "email"
+          type: "string"
           example: "https://mail.google.com"
    
 

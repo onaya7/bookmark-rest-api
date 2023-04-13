@@ -1,13 +1,13 @@
 from flask import Blueprint, request, jsonify, redirect
 from src.constants.http_status_codes import *
-from src.database import Bookmark, db
+from src.database import Bookmark, db, User
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import validators
 from flasgger import swag_from
 
 bookmarks = Blueprint("bookmarks", __name__, url_prefix="/api/v1/bookmarks")
 
-
+    
 @bookmarks.post('/')
 @jwt_required(fresh=True)
 @swag_from("./docs/bookmark/add_bookmark.yaml")
@@ -23,15 +23,40 @@ def add_bookmark():
         if not validators.url(url):
             return jsonify({
                 'error': 'Enter a valid url'
-            }),     HTTP_400_BAD_REQUEST
+            }), HTTP_400_BAD_REQUEST
+            
+        #checking for the particular user in db
+        user = User.query.filter_by(id=current_user).first()
+        #looping through the bookmarks of the user
 
-        # To check db if url already exist    
-        existing_url = Bookmark.query.filter_by(url=url).first()
+        if user.bookmarks == None:
+            # adding checked data into the database 
+            bookmark = Bookmark(url=url, body=body, user_id=current_user)
+            db.session.add(bookmark)
+            db.session.commit()
+
+            return jsonify({
+                'id': bookmark.id,
+                'url': bookmark.url,
+                'short_url': bookmark.short_url,
+                'visit': bookmark.visits,
+                'body': bookmark.body,
+                'created_at': bookmark.created_at,
+                'updated_at': bookmark.updated_at,
+            }), HTTP_201_CREATED
+            
+        existing_url = None  # define existing_url outside the loop
+        for item in user.bookmarks:
+            # getting the urls in the user bookmarks
+            if item.url == url:
+                existing_url = item.url  # update existing_url if a match is found
+                break
+            
         if existing_url:
             return jsonify({
-                'error':"URL already exists"
+                'error': "URL already exists"
             }), HTTP_409_CONFLICT
-
+        
         # adding checked data into the database 
         bookmark = Bookmark(url=url, body=body, user_id=current_user)
         db.session.add(bookmark)
@@ -41,11 +66,11 @@ def add_bookmark():
             'id': bookmark.id,
             'url': bookmark.url,
             'short_url': bookmark.short_url,
-            'visit':bookmark.visits,
+            'visit': bookmark.visits,
             'body': bookmark.body,
             'created_at': bookmark.created_at,
             'updated_at': bookmark.updated_at,
-        }), HTTP_201_CREATED
+        }), HTTP_201_CREATED   
 
 @bookmarks.get('/')
 @jwt_required(fresh=True)

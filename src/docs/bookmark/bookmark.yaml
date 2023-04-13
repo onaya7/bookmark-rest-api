@@ -1,12 +1,13 @@
-Get a list of  bookmark 
+Get a list of added bookmark
 ---
 tags:
   - Bookmarks
-parameters:
-  - name: Authorization
-    description: This body gets an array of all bookmarks
-    in: header
-    required: true
+consumes:
+- "application/json"
+produces:
+- "application/json"
+security:
+- JWTAuth: []
 responses:
   200:
     description: An array of all Bookmark

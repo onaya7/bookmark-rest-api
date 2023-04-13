@@ -14,7 +14,7 @@ parameters:
         - "password"
       properties:
         email:
-          type: "email"
+          type: "string"
           example: "admin@gmail.com"
         password:
           type: "string"
