@@ -2,7 +2,7 @@ template = {
   "swagger": "2.0",
   "info": {
     "title": "Bookmark API",
-    "description": "Bookmark API for my data",
+    "description": "The bookmark API is a web-based application programming interface that allows users to manage their bookmarks. This API provides a set of endpoints that enable users to perform CRUD (Create, Read, Update, Delete) operations on their bookmarks.",
     "contact": {
       "responsibleOrganization": "Dev_onaya",
       "responsibleDeveloper": "Samuel Ayano",
@@ -37,8 +37,8 @@ swagger_config = {
     ],
     "specs": [
         {
-            "endpoint": 'apispec',
-            "route": '/apispec.json',
+            "endpoint": 'bookmark-api',
+            "route": '/bookmark-api.json',
             "rule_filter": lambda rule: True,  # all in
             "model_filter": lambda tag: True,  # all in
         }

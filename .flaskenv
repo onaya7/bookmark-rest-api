@@ -1,3 +1,3 @@
-FLASK_APP=src
+FLASK_APP=run
 FLASK_ENV=development
 FLASK_DEBUG=TRUE
