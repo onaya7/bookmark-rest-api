@@ -2,15 +2,33 @@ Get stats about bookmarks
 ---
 tags:
   - Bookmarks
-consumes:
-- "application/json"
-produces:
-- "application/json"
+summary: Get bookmark stats
+description: Get the stats for all bookmarks
+content:
+    application/json:
 security:
 - JWTAuth: []
 responses:
-  200:
-    description: Bookmarks stats
-
-  401:
-    description: Fails to get items due to authentication error
+      200:
+        description: Bookmark stats
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                  items:
+                    type: object
+                    properties:
+                      visits:
+                        type: integer
+                        description: Number of visits to bookmark
+                      url:
+                        type: string
+                        description: URL of bookmark
+                      id:
+                        type: integer
+                        description: The ID of bookmark
+                      short_url:
+                        type: string
+                        description: The shortened URL of the updated bookmark
+              

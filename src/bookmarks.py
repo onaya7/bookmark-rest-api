@@ -197,7 +197,7 @@ def delete_bookmark(id):
     db.session.commit()
     return jsonify({
            "message":"Item has been deleted successfully"
-        }), HTTP_200_OK
+        }), HTTP_204_NO_CONTENT
 
 @bookmarks.get('/stats')
 @jwt_required(fresh=True)

@@ -2,10 +2,10 @@ Adding a bookmark
 ---
 tags:
   - Bookmarks
-consumes:
-- "application/json"
-produces:
-- "application/json"
+summary: Add a new bookmark
+description: Add a new bookmark for the current user
+content:
+    application/json:
 security:
 - JWTAuth: []
 parameters:
@@ -16,26 +16,72 @@ parameters:
     schema:
       type: object
       required:
-        - "body"
         - "url"
       properties:
         body:
-          type: "string"
+          type: string
+          description: An optional description of the bookmark
           example: "This is a link to gmail"
         url:
-          type: "string"
+          type: string
+          format: uri
+          description: The URL of the bookmark
           example: "https://mail.google.com"
-   
-
 responses:
-  201:
-    description: When a Bookmark is added successfully
-
-  400:
-    description: Fails to Add a new bookmark due to bad request data
-
-  401:
-    description: Unauthorised error 
-
-  409:
-    description: Fails to Add a new bookmark due to conflict from existing data.
+  '201':
+    description: Bookmark created
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            id:
+              type: integer
+              description: The ID of the new bookmark
+            url:
+              type: string
+              format: uri
+              description: The URL of the new bookmark
+              example: "https://www.example.com"
+            short_url:
+              type: string
+              description: The short URL of the new bookmark
+            visit:
+              type: integer
+              description: The number of visits to the new bookmark
+            body:
+              type: string
+              description: The description of the new bookmark
+              example: "Example description"
+            created_at:
+              type: string
+              format: date-time
+              description: The date and time when the new bookmark was created
+              example: "2023-04-13T10:30:00Z"
+            updated_at:
+              type: string
+              format: date-time
+              description: The date and time when the new bookmark was last updated
+              example: "2023-04-13T10:30:00Z"
+  '400':
+    description: Bad request
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              description: The error message
+              example: "Enter a valid URL"
+  '409':
+    description: Conflict
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              description: The error message
+              example: "URL already exists"

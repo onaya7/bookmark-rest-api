@@ -2,36 +2,60 @@ User Registration
 ---
 tags:
   - Authentication
+summary: Register a new user
+description: Register a new user with the provided credentials
+content:
+      application/json:
 parameters:
   - name: body
     description: The body should contain the user Registration data
     in: body
     required: true
     schema:
-      type: object
-      required:
-        - "email"
-        - "username"
-        - "password"
-        - "confirm_password"
-      properties:
-        email:
-          type: email
-          example: "admin@gmail.com"
-        username:
-          type: username
-          example: "admin"
-        password:
-          type: password 
-          format: password
-          example: "Admin1$"
-        confirm_password:
-          type: password
-          format: password
-          example: "Admin1$"
+          type: object
+          properties:
+            username:
+              type: string
+              example: "admin"
+            email:
+              type: string
+              example: "admin@gmail.com"
+            password:
+              type: string
+              example: "Admin1$"
+            confirm_password:
+              type: string
+              example: "Admin1$"
+          required:
+            - username
+            - email
+            - password
+            - confirm_password
 responses:
-  201:
-    description: When a user successfully Register
-
-  400:
-    description: Fails to Register due to bad request data
+    "201":
+      description: User registered successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              user:
+                type: object
+                properties:
+                  username:
+                    type: string
+                    example: "admin"
+                  email:
+                    type: string
+                    example: "admin@gmail.com"
+    "400":
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object

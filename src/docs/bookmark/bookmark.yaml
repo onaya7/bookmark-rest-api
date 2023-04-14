@@ -2,15 +2,58 @@ Get a list of added bookmark
 ---
 tags:
   - Bookmarks
-consumes:
-- "application/json"
-produces:
-- "application/json"
+summary: Get a list of bookmarks
+description: Returns a list of bookmarks for the current user
+content:
+    application/json:
 security:
 - JWTAuth: []
 responses:
-  200:
-    description: An array of all Bookmark
-
-  401:
-     description: Unauthorized error
+  '200':
+    description: List of bookmarks
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: The ID of the bookmark
+              url:
+                type: string
+                format: uri
+                description: The URL of the bookmark
+                example: "https://www.example.com"
+              short_url:
+                type: string
+                description: The short URL of the bookmark
+              visit:
+                type: integer
+                description: The number of visits to the bookmark
+              body:
+                type: string
+                description: The description of the bookmark
+                example: "Example description"
+              created_at:
+                type: string
+                format: date-time
+                description: The date and time when the bookmark was created
+                example: "2023-04-13T10:30:00Z"
+              updated_at:
+                type: string
+                format: date-time
+                description: The date and time when the bookmark was last updated
+                example: "2023-04-13T10:30:00Z"
+  '401':
+    description: Unauthorized
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              description: The error message
+              example: "Authentication failed"

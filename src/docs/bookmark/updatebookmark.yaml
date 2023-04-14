@@ -2,40 +2,96 @@ Updating a bookmark with a specified ID
 ---
 tags:
   - Bookmarks
-consumes:
-- "application/json"
-produces:
-- "application/json"
+summary: Update a bookmark by ID
+description: Updates a bookmark with the specified ID
+content:
+    application/json:
 security:
 - JWTAuth: []
 parameters:
-  - name: id
-    in: path
-    required: true 
-  - name: body
-    in: body
-    description: This body updates an existing bookmark 
-    required: true
-    schema:
-      type: object
-      required:
-        - "body"
-        - "url"
+    - name: id
+      in: path
+      required: true
+      description: The ID of the bookmark to update
+    - name: body
+      in: body
+      required: true
+      description: The bookmark object to update
       properties:
-        body:
-          type: "string"
-          example: "This is a link to gmail"
-        url:
-          type: "string"
-          exmple: "https://mail.google.com"
-   
-
+          url:
+            type: string
+            description: The URL of the bookmark
+            example: "https://geek4geeks.com"
+          body:
+            type: string
+            description: The body text of the bookmark
+            example: "This is a great article about machine learning!"
 responses:
-  200:
-    description: Operation successfull
-
-  401:
-    description: Unauthorised error 
-
-  404:
-    description: Bookmark not found
+    '200':
+      description: The bookmark has been updated
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: The ID of the updated bookmark
+                example: 1
+              url:
+                type: string
+                description: The URL of the updated bookmark
+                example: "https://geek4geeks.com"
+              short_url:
+                type: string
+                description: The shortened URL of the updated bookmark
+                example: "https://example.com/XYZ"
+              visits:
+                type: integer
+                description: The number of visits to the updated bookmark
+                example: 0
+              body:
+                type: string
+                description: The body text of the updated bookmark
+                example: "This is a great article about machine learning!"
+              created_at:
+                type: string
+                description: The creation timestamp of the updated bookmark
+                example: "2023-04-13 12:00:00"
+              updated_at:
+                type: string
+                description: The update timestamp of the updated bookmark
+                example: "2023-04-13 12:01:00"
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: The error message
+                example: "Invalid URL"
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: The error message
+                example: "Authentication failed"
+    '404':
+      description: Bookmark not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: The error message
+                example: "Bookmark not found"

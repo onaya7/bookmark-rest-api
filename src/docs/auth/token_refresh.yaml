@@ -2,22 +2,37 @@ Refreshes an access token
 ---
 tags:
   - Authentication
-parameters:
-  - in: header
-    name: Authorization
-    description: This body takes in a refresh token The refresh token is sent and returned via cookies.
-    required: true
-    schema:
-      type: object
-      required:
-        - "jwtToken"
-     
+summary: Refresh access token
+description: Refreshes an expired access token using the provided refresh token
+content:
+      application/json:
+security:
+- JWTAuth: []
 responses:
-  200:
-    description: a JWT access token was created succesfully
-    headers:
-            Set-Cookie:
-              description: "`refreshToken`"
-              schema:
-                type: string
-                example: refreshToken=51872eca5efedcf424db4cf5afd16a9d00ad25b743a034c9c221afc85d18dcd5e4ad6e3f08607550; Path=/; Expires=Tue, 16 Jun 2020 09:14:17 GMT; HttpOnly
+      '200':
+        description: Token refreshed successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                access_token:
+                  type: string
+                  description: The new access token
+              example:
+                access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsImlhdCI6MTYxOTQ2MTM2NiwiZXhwIjoxNjE5NDY0OTY2fQ.CrxjAFKnzH5cZ-UovJG0f-Whp9X9Lvnn3PG0hWbUh5I
+      '401':
+        description: UnauthorizedError
+      '422':
+        description: TokenRefreshError
+      '500':
+        description: InternalServerError
+        x-code-samples:
+        - lang: shell
+          source: |
+            #!/bin/bash
+            curl --request POST \
+              --url 'http://localhost:5000/auth/token/refresh' \
+              --header 'Authorization: Bearer <refresh_token>' \
+              --header 'Content-Type: application/json' \
+            --data '{}'

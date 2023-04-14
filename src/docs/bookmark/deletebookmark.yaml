@@ -1,11 +1,11 @@
-Deleting a bookmark with a specified ID
+Delete bookmark with a specified ID
 ---
 tags:
   - Bookmarks
-consumes:
-- "application/json"
-produces:
-- "application/json"
+summary: Delete a bookmark by ID
+description: Deletes a bookmark with the specified ID
+content:
+    application/json:
 security:
 - JWTAuth: []
 parameters:
@@ -13,11 +13,27 @@ parameters:
     in: path
     required: true 
 responses:
-  200:
-    description: Operation successfull
-
-  401:
-     description: Unauthorized error
-
-  404:
-      description: Bookmark not found
+  '204':
+    description: The bookmark has been deleted
+  '401':
+    description: Unauthorized
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              description: The error message
+              example: "Authentication failed"
+  '404':
+    description: Bookmark not found
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              description: The error message
+              example: "Bookmark not found"
