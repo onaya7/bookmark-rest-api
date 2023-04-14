@@ -46,7 +46,6 @@ def register():
 
         user = User(username=username, email=email, password=password)
         user.create_password_hash(password)
-        print(user.password)
         db.session.add(user)
         db.session.commit()
 
