@@ -13,6 +13,7 @@ from flask_migrate import Migrate
 from flask_wtf import CSRFProtect
 from datetime import timedelta
 import psycopg2
+from flask_bcrypt import Bcrypt
 
 
 def create_app(test_config=None):
@@ -52,6 +53,9 @@ def create_app(test_config=None):
     # configure CSRF
     app.config['WTF_CSRF_ENABLED'] = False
     CSRFProtect(app)
+    
+    bcrypt = Bcrypt(app)
+
     
     #configure JWT Tokens time
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)

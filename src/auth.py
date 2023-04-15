@@ -14,9 +14,8 @@ from flask_jwt_extended import (
     create_refresh_token,
 )
 from flasgger import swag_from
-from src.forms import RegistrationForm, LoginForm,  PasswordresetForm
-from src.instance import bcrypt
-from flask_bcrypt import generate_password_hash
+from src.forms import RegistrationForm, PasswordresetForm
+from werkzeug.security import check_password_hash,generate_password_hash
 
 
 auth = Blueprint("auth", __name__, url_prefix="/api/v1/auth")
@@ -64,45 +63,41 @@ def register():
 @swag_from("./docs/auth/login.yaml")
 def login():
 
-    email = request.json["email"]
-    password = request.json["password"]
+    email = request.json.get('email')
+    password = request.json.get('password')
 
     # To check if user exist in db
     # first filter by the email if the user with that email already exist
     user = User.query.filter_by(email=email).first()
     
     if not user:
-        return jsonify({
-            "error": "This user does not exist try registering to get access"
-        }), HTTP_400_BAD_REQUEST
+        return jsonify({"error": "This email address is not registered"}), HTTP_400_BAD_REQUEST
         
-    is_pass_correct = bcrypt.check_password_hash(user.password, password)
-        
-    # if user exists and passwords matches hashed password
-    if user and is_pass_correct:
-
-        # if user and password is correct
-        access = create_access_token(identity=user.id , fresh=True)
-        refresh = create_refresh_token(identity=user.id)
-       
-
-        return (
-            jsonify(
-                {
-                    "user": {
-                        "access": access,
-                        "refresh": refresh,
-                        "username": user.username,
-                        "email": user.email,
-                    }
-                }
-            ),
-            HTTP_200_OK,
-        )
-
-    return jsonify({
+    if not check_password_hash(user.password, password):
+         return jsonify({
         "error": "Invalid password for this account, passwords might be case sensitive"
-    }),HTTP_401_UNAUTHORIZED
+        }),HTTP_401_UNAUTHORIZED
+    
+    # if user and password is correct
+    access = create_access_token(identity=user.id , fresh=True)
+    refresh = create_refresh_token(identity=user.id)
+    
+
+    return (
+        jsonify(
+            {
+                "user": {
+                    "access": access,
+                    "refresh": refresh,
+                    "username": user.username,
+                    "email": user.email,
+                }
+            }
+        ),
+        HTTP_200_OK,
+    )
+
+   
 
 
 @auth.post("/passwordreset")
