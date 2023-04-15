@@ -12,7 +12,7 @@ template = {
     "termsOfService": "http://me.com/terms",
     "version": "1.0"
   },
-  "host": "localhost:5000",  # overrides localhost:500
+  "host": "bookmark-api-3nfy.onrender.com",  # overrides localhost:500
   "basePath": "/api/v1",  # base bash for blueprint registration
   "schemes": [
     "http",
