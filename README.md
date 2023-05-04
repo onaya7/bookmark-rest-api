@@ -63,6 +63,9 @@ Then run:
 flask run
 
 ```
+### Website url
+https://bookmark-api-3nfy.onrender.com/
+
 ### Testing the server
 Once started, you can navigate to 
 http://127.0.0.1:5000/bookmark-api.json to view the Swagger Resource Listing.
