@@ -12,7 +12,6 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_wtf import CSRFProtect
 from datetime import timedelta
-import psycopg2
 from flask_bcrypt import Bcrypt
 
 
