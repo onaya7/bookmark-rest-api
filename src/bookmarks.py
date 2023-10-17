@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, redirect
+from flask import Blueprint, request, jsonify
 from src.constants.http_status_codes import *
 from src.database import Bookmark, db, User
 from flask_jwt_extended import jwt_required, get_jwt_identity

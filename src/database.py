@@ -1,10 +1,10 @@
-from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash
 from datetime import datetime
 import string
 from random import choices
+from src.extensions import db
 
-db = SQLAlchemy()
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)

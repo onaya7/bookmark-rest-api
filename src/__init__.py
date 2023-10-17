@@ -13,6 +13,9 @@ from flask_migrate import Migrate
 from flask_wtf import CSRFProtect
 from datetime import timedelta
 from flask_bcrypt import Bcrypt
+from src.extensions import db
+
+
 
 
 def create_app(test_config=None):
