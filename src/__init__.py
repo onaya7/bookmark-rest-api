@@ -16,8 +16,6 @@ from flask_bcrypt import Bcrypt
 from src.extensions import db
 
 
-
-
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
 
@@ -39,6 +37,7 @@ def create_app(test_config=None):
 
     db.init_app(app)
    
+  
     
     # configure JWTManager
     JWTManager(app)
