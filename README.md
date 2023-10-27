@@ -64,7 +64,7 @@ flask run
 
 ```
 ### Website url
-https://bookmark-api-3nfy.onrender.com/
+https://bra.devonaya.com/
 
 ### Testing the server
 Once started, you can navigate to 
